@@ -1,3 +1,4 @@
+import { getData } from "@/lib/storage";
 import { useState } from "react";
 
 export default function Home() {
@@ -10,19 +11,12 @@ export default function Home() {
     setLoading(true);
     setError(null);
 
+    
     try {
-      const response = await fetch('/api/get-data');
-      const result = await response.json();
-
-      if (response.ok) {
-        setData(result);
-      } else {
-        setError(result.error || "Something went wrong");
-      }
+      const data = await getData();
+      setData(data);
     } catch (error) {
-      setError("Failed to fetch data");
-    } finally {
-      setLoading(false);
+      setError(error.message || "Database error"); // Встановлюємо повідомлення про помилку
     }
   }
 
