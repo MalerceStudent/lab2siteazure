@@ -1,10 +1,10 @@
-// lib/db.js
+"use server"
 import sql from 'mssql';
 
 const config = {
     user: 'servernodesql',
     password: 'Qqwerty933',
-    server: 'tcp:databaseservernode.database.windows.net,1433',
+    server: 'databaseservernode.database.windows.net',
     database: 'databaseforNode',
     options: {
         encrypt: true, // Використовуємо шифрування для безпечного з'єднання
@@ -24,6 +24,7 @@ export const connectToDb = async () => {
 // Приклад виконання запиту
 export const getData = async () => {
     try {
+        connectToDb();
         const result = await sql.query`SELECT * FROM your_table_name`;
         return result.recordset; // Повертаємо результат
     } catch (err) {
