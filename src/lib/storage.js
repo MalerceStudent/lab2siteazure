@@ -21,13 +21,68 @@ export const connectToDb = async () => {
     }
 };
 
-// Приклад виконання запиту
-export const getData = async () => {
+
+export async function getUsers() {
     try {
-        connectToDb();
-        const result = await sql.query`SELECT * FROM your_table_name`;
-        return result.recordset; // Повертаємо результат
+      await connectToDb();
+      const result = await sql.query("SELECT * FROM users");
+      console.log("succesed get")
+      return result;
+      
     } catch (err) {
-        console.error('Error executing query:', err);
+        console.error("Помилка в get:", err.message);
     }
-};
+}
+
+// Додавання нового користувача
+export async function addUser(req) {
+    try {
+        console.log("fffffffffffffffffffff", req)
+      const { name, email } = req;
+      if (!name || !email) {
+        return {
+            message: "2222",
+    
+        };
+      }
+
+      await connectToDb();
+      await sql.query`INSERT INTO users (name, email) VALUES (${name}, ${email})`;
+      console.log("succesed")
+    } catch (err) {
+        console.error("Помилка в addUser:", err.message);
+
+    }
+}
+  
+  // Оновлення користувача
+  export async function editUser(req) {
+    try {
+        console.log(req)
+      const { id, name, email } = req;
+      if (!id || !name || !email){
+        return;
+      }
+      await connectToDb();
+      await sql.query`UPDATE users SET name = ${name}, email = ${email} WHERE id = ${id}`;
+      console.log("succesed")
+    } catch (err) {
+        console.error("Помилка в editUser:", err.message);
+    }
+  }
+  
+  // Видалення користувача
+  export async function deleteUser(id) {
+    try {
+        console.log(id)
+      if (!id){
+        return;
+      }
+  
+      await connectToDb();
+      await sql.query`DELETE FROM users WHERE id = ${id}`;
+      console.log("succesed")
+    } catch (err) {
+        console.error("Помилка в deleteUser:", err.message);
+    }
+  }

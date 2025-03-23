@@ -1,42 +1,125 @@
-import { getData } from "@/lib/storage";
-import { useState } from "react";
+"use client";
+import { actionAddUser } from "@/lib/action";
+import { deleteUser, getUsers } from "@/lib/storage";
+import { useState, useEffect } from "react";
+import { useActionState } from "react";
 
 export default function Home() {
-  const [data, setData] = useState(null);
+  const [state, formAction] = useActionState(actionAddUser, {message: null});
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [form, setForm] = useState({ id: null, name: "", email: "" });
+  const [editing, setEditing] = useState(false);
 
-  // Обробка кліку на кнопку
-  async function handlerClick() {
-    setLoading(true);
-    setError(null);
-
-    
-    try {
-      const data = await getData();
-      setData(data);
-    } catch (error) {
-      setError(error.message || "Database error"); // Встановлюємо повідомлення про помилку
+  useEffect(() => {
+    if(state.message == "Yeeppii") {
+      setEditing(false)
     }
-  }
+      fetchUsers();
+  
+  }, [state.message]);
+  
+
+  // Отримати список користувачів
+  const fetchUsers = async () => {
+ 
+    setLoading(true);
+    try {
+      const res = await getUsers();
+      console.log(res.recordset);
+
+      setUsers(res.recordset);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Додавання або оновлення користувача
+  const handleSubmit = async (e) => {
+   setEditing()
+  };
+
+  // Видалення користувача
+  const handleDelete = async (id) => {
+    await deleteUser(id);
+    fetchUsers();
+
+  };
 
   return (
-    <div className="p-8 text-center font-sans">
-      <h1 className="text-2xl font-semibold mb-6">Try this:</h1>
-      <button
-        onClick={handlerClick}
-        className="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-700 transition duration-300"
-      >
-        Click
-      </button>
+    <div className="p-8 text-center">
+      <h1 className="text-2xl font-semibold mb-6">User Management</h1>
 
-      {loading && <p className="mt-4 text-lg">Loading...</p>}
-      {error && <p className="mt-4 text-lg text-red-500 font-bold">{error}</p>}
-      {data && (
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-xl mb-4">Data from Database:</h2>
-          <pre className="bg-white p-4 rounded-lg text-sm">{JSON.stringify(data, null, 2)}</pre>
-        </div>
+      {/* Форма для додавання/редагування */}
+      <form action={formAction} className="mb-6">
+        <input
+        name="name"
+          type="text"
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          required
+          className="p-2 border rounded mr-2"
+        />
+        <input
+        name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+          className="p-2 border rounded mr-2"
+        />
+        <input hidden name="isEditing" value={editing}></input>
+        <input hidden name="id" value={form.id}></input>
+        <button className="px-4 py-2 bg-blue-500 text-white rounded">
+          {editing ? "Update" : "Add"}
+        </button>
+        {state.message && <p>{state.message}</p>}
+      </form>
+
+      {/* Таблиця користувачів */}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">ID</th>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Email</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="border">
+                <td className="border p-2">{user.id}</td>
+                <td className="border p-2">{user.name}</td>
+                <td className="border p-2">{user.email}</td>
+                <td className="border p-2">
+                  <button
+                    className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                    onClick={() => {
+                      setForm(user);
+                      setEditing(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    onClick={() => handleDelete(user.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
