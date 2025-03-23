@@ -11,13 +11,13 @@ export default function Home() {
   const [form, setForm] = useState({ id: null, name: "", email: "" });
   const [editing, setEditing] = useState(false);
 
-  useEffect(() => {
-    if(state.message == "Yeeppii") {
-      setEditing(false)
-    }
-      fetchUsers();
+  // useEffect(() => {
+  //   if(state.message == "Yeeppii") {
+  //     setEditing(false)
+  //   }
+  //     fetchUsers();
   
-  }, [state.message]);
+  // }, [state.message]);
   
 
   // Отримати список користувачів
