@@ -36,11 +36,6 @@ export default function Home() {
     }
   };
 
-  // Додавання або оновлення користувача
-  const handleSubmit = async (e) => {
-   setEditing()
-  };
-
   // Видалення користувача
   const handleDelete = async (id) => {
     await deleteUser(id);
@@ -58,7 +53,7 @@ export default function Home() {
         name="name"
           type="text"
           placeholder="Name"
-          value={form.name}
+          value={form.name || ""}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           required
           className="p-2 border rounded mr-2"
@@ -67,13 +62,13 @@ export default function Home() {
         name="email"
           type="email"
           placeholder="Email"
-          value={form.email}
+          value={form.email || ""}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
           className="p-2 border rounded mr-2"
         />
-        <input hidden name="isEditing" value={editing}></input>
-        <input hidden name="id" value={form.id}></input>
+        <input hidden name="isEditing" defaultValue={editing || false}></input>
+        <input hidden name="id"  defaultValue={form.id || ""}></input>
         <button className="px-4 py-2 bg-blue-500 text-white rounded">
           {editing ? "Update" : "Add"}
         </button>
