@@ -5,10 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-   "start": "next start -p 8080",
+   "start": "next start",
 
-    "lint": "next lint",
-    "postinstall": "next build"
+    "lint": "next lint"
   },
   "dependencies": {
     "mssql": "^11.0.1",
